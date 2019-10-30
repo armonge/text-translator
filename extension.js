@@ -65,7 +65,7 @@ const TranslatorPanelButton = GObject.registerClass(
     class Button extends PanelMenu.Button {
         _init(translator) {
             super._init(0.0, "text-translator");
-            this.actor.reactive = false;
+            this.reactive = false;
 
             this._translator = translator;
             this._icon = new St.Icon({
@@ -79,12 +79,10 @@ const TranslatorPanelButton = GObject.registerClass(
             );
 
             this._add_menu_items();
-            this.actor.add_actor(this._icon);
+            this.add_actor(this._icon);
         }
 
         _add_menu_items() {
-            let menu_item;
-
             this._item_open = new PopupMenu.PopupMenuItem("Open");
             this._item_open.connect("activate", () => {
                 this._translator.open();
@@ -123,7 +121,7 @@ const TranslatorPanelButton = GObject.registerClass(
             this.menu.addMenuItem(this._menu_open_prefs);
         }
 
-        _on_button_press(o, e) {
+        _on_button_press(_o, e) {
             let button = e.get_button();
 
             switch (button) {
@@ -143,9 +141,9 @@ const TranslatorPanelButton = GObject.registerClass(
 
         set_focus(focus) {
             if (focus) {
-                this.actor.add_style_pseudo_class("active");
+                this.add_style_pseudo_class("active");
             } else {
-                this.actor.remove_style_pseudo_class("active");
+                this.remove_style_pseudo_class("active");
             }
         }
 
@@ -180,7 +178,7 @@ const TranslatorPanelButton = GObject.registerClass(
 
                         clipboard.get_text(
                             St.ClipboardType.PRIMARY,
-                            (clipboard, selection_text) => {
+                            (_clipboard, selection_text) => {
                                 let selection_length = 0;
 
                                 if (!Utils.is_blank(selection_text)) {
@@ -220,7 +218,7 @@ const TranslatorPanelButton = GObject.registerClass(
 
 const TranslatorsPopup = class TranslatorsPopup extends PopupMenu.PopupMenu {
     constructor(button, dialog) {
-        super(button.actor, 0, St.Side.TOP);
+        super(button, 0, St.Side.TOP);
         this._button = button;
         this._dialog = dialog;
 
@@ -231,13 +229,13 @@ const TranslatorsPopup = class TranslatorsPopup extends PopupMenu.PopupMenu {
             style_class: "translator-translators-popup-escape-label"
         });
 
-        this.actor.hide();
-        Main.uiGroup.add_actor(this.actor);
+        this.hide();
+        Main.uiGroup.add_actor(this);
 
-        this._dialog.source.actor.connect("button-press-event", () => {
+        this._dialog.source.connect("button-press-event", () => {
             if (this.isOpen) this.close(true);
         });
-        this._dialog.target.actor.connect("button-press-event", () => {
+        this._dialog.target.connect("button-press-event", () => {
             if (this.isOpen) this.close(true);
         });
     }
@@ -253,23 +251,23 @@ const TranslatorsPopup = class TranslatorsPopup extends PopupMenu.PopupMenu {
 
     open() {
         this._button.set_sensitive(false);
-        this._button.actor.add_style_pseudo_class("active");
+        this._button.add_style_pseudo_class("active");
         this.box.add(this._label_menu_item);
         super.open(true);
-        this.firstMenuItem.actor.grab_key_focus();
+        this.firstMenuItem.grab_key_focus();
     }
 
     close() {
         super.close(true);
         this._button.set_sensitive(true);
-        this._button.actor.remove_style_pseudo_class("active");
+        this._button.remove_style_pseudo_class("active");
         this._dialog.source.grab_key_focus();
         this.destroy();
     }
 
     destroy() {
         this.removeAll();
-        this.actor.destroy();
+        this.destroy();
 
         this.emit("destroy");
 
@@ -281,8 +279,8 @@ const TranslatorsPopup = class TranslatorsPopup extends PopupMenu.PopupMenu {
 const TranslatorExtension = class TranslatorExtension {
     constructor() {
         log("Translator Extension");
-        this._current_source_lang = ''
-        this._current_target_lang = ''
+        this._current_source_lang = "";
+        this._current_target_lang = "";
         this._dialog = new TranslatorDialog.TranslatorDialog(this);
         this._dialog.source.clutter_text.connect("text-changed", () => {
             let enable_instant_translation = Utils.SETTINGS.get_boolean(
@@ -331,12 +329,12 @@ const TranslatorExtension = class TranslatorExtension {
         this._languages_stats.connect("stats-changed", () =>
             this._show_most_used()
         );
-        this._dialog.most_used.sources.connect("clicked", (object, data) => {
+        this._dialog.most_used.sources.connect("clicked", (_object, data) => {
             this._dialog.most_used.sources.select(data.lang_code);
             this._set_current_source(data.lang_code);
             this._current_langs_changed();
         });
-        this._dialog.most_used.targets.connect("clicked", (object, data) => {
+        this._dialog.most_used.targets.connect("clicked", (_object, data) => {
             this._dialog.most_used.targets.select(data.lang_code);
             this._set_current_target(data.lang_code);
             this._current_langs_changed();
@@ -395,7 +393,7 @@ const TranslatorExtension = class TranslatorExtension {
         }
     }
 
-    _on_key_press_event(object, event) {
+    _on_key_press_event(_object, event) {
         let state = event.get_state();
         let symbol = event.get_key_symbol();
         let code = event.get_key_code();
@@ -556,7 +554,7 @@ const TranslatorExtension = class TranslatorExtension {
         help_dialog.open();
     }
 
-    _on_source_language_chose(object, language) {
+    _on_source_language_chose(_object, language) {
         this._most_used_bar_select_current();
         this._set_current_source(language.code);
         this._current_langs_changed();
@@ -564,7 +562,7 @@ const TranslatorExtension = class TranslatorExtension {
         this._translate();
     }
 
-    _on_target_language_chose(object, language) {
+    _on_target_language_chose(_object, language) {
         this._most_used_bar_select_current();
         this._set_current_target(language.code);
         this._current_langs_changed();
@@ -600,14 +598,14 @@ const TranslatorExtension = class TranslatorExtension {
             "Choose source language",
             button_params,
             () => {
-                    this._source_language_chooser.open();
-                    this._source_language_chooser.set_languages(
-                        this._translators_manager.current.get_languages()
-                    );
-                    this._source_language_chooser.show_languages(
-                        this._current_source_lang
-                    );
-                }
+                this._source_language_chooser.open();
+                this._source_language_chooser.set_languages(
+                    this._translators_manager.current.get_languages()
+                );
+                this._source_language_chooser.show_languages(
+                    this._current_source_lang
+                );
+            }
         );
 
         return button;
@@ -893,7 +891,7 @@ const TranslatorExtension = class TranslatorExtension {
         this.open();
 
         let clipboard = St.Clipboard.get_default();
-        clipboard.get_text(clipboard_type, (clipboard, text) => {
+        clipboard.get_text(clipboard_type, (_clipboard, text) => {
             if (Utils.is_blank(text)) {
                 this._dialog.statusbar.add_message(
                     "Clipboard is empty.",
