@@ -913,9 +913,7 @@ const TranslatorExtension = class TranslatorExtension {
             PrefsKeys.OPEN_TRANSLATOR_KEY,
             Utils.SETTINGS,
             Meta.KeyBindingFlags.NONE,
-            Shell.ActionMode.NORMAL |
-                Shell.ActionMode.MESSAGE_TRAY |
-                Shell.ActionMode.OVERVIEW,
+            Shell.ActionMode.NORMAL | Shell.ActionMode.OVERVIEW,
             () => {
                 this.open();
             }
@@ -925,9 +923,7 @@ const TranslatorExtension = class TranslatorExtension {
             PrefsKeys.TRANSLATE_FROM_CLIPBOARD_KEY,
             Utils.SETTINGS,
             Meta.KeyBindingFlags.NONE,
-            Shell.ActionMode.NORMAL |
-                Shell.ActionMode.MESSAGE_TRAY |
-                Shell.ActionMode.OVERVIEW,
+            Shell.ActionMode.NORMAL | Shell.ActionMode.OVERVIEW,
             () => {
                 this._translate_from_clipboard(St.ClipboardType.CLIPBOARD);
             }
@@ -937,9 +933,7 @@ const TranslatorExtension = class TranslatorExtension {
             PrefsKeys.TRANSLATE_FROM_SELECTION_KEY,
             Utils.SETTINGS,
             Meta.KeyBindingFlags.NONE,
-            Shell.ActionMode.NORMAL |
-                Shell.ActionMode.MESSAGE_TRAY |
-                Shell.ActionMode.OVERVIEW,
+            Shell.ActionMode.NORMAL | Shell.ActionMode.OVERVIEW,
             () => {
                 this._translate_from_clipboard(St.ClipboardType.PRIMARY);
             }
